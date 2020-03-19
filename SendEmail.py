@@ -15,7 +15,7 @@ class SendEmail:
         msg = EmailMessage()
         msg["Subject"] = "Check your monthly expense"
         msg["From"] = formataddr(("MonthlyExpense", self.EMAIL_ADDRESS))
-        msg["To"] = "jrbrishila@gmail.com"
+        msg["To"] = "xxxx@gmail.com"
         msg.set_content("File Attached...")
 
         file_append = datetime.now().strftime("%b%Y")
