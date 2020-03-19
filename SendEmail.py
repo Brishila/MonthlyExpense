@@ -2,25 +2,44 @@ import smtplib
 import os
 from email.message import EmailMessage
 from email.utils import formataddr
+from datetime import datetime
+from ExcelReport import ExcelReport
 
-EMAIL_ADDRESS = os.environ.get('EMAIL_USER')
-EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
-msg = EmailMessage()
-msg['Subject'] = 'Check your monthly expense'
-msg['From'] = formataddr(('Brishila', EMAIL_ADDRESS))
-msg['To'] = 'manikumar06@gmail.com'
-msg.set_content('File Attached...')
+class SendEmail:
+    def __init__(self):
+        self.EMAIL_ADDRESS = os.environ.get("EMAIL_USER")
+        self.EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
-files = ['MonthlyExpenses.xlsx']
+    def send_report(self):
+        msg = EmailMessage()
+        msg["Subject"] = "Check your monthly expense"
+        msg["From"] = formataddr(("MonthlyExpense", self.EMAIL_ADDRESS))
+        msg["To"] = "jrbrishila@gmail.com"
+        msg.set_content("File Attached...")
 
-for file in files:
-    with open(file, 'rb') as f:
-        file_data = f.read()
-        file_name = f.name
+        file_append = datetime.now().strftime("%b%Y")
+        fname = "MonthlyExpenses-" + file_append + ".xlsx"
+        excel = ExcelReport(fname)
 
-    msg.add_attachment(file_data, maintype = 'application', subtype = 'octet-stream', filename = file_name)
+        try:
+            excel.create_report()
+        except:
+            pass
 
-with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-    smtp.login(EMAIL_ADDRESS,  EMAIL_PASSWORD)
-    smtp.send_message(msg)
+        files = [fname]
+        for report in files:
+            with open(report, "rb") as f:
+                file_data = f.read()
+                file_name = f.name
+
+            msg.add_attachment(
+                file_data,
+                maintype="application",
+                subtype="octet-stream",
+                filename=file_name,
+            )
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(self.EMAIL_ADDRESS, self.EMAIL_PASSWORD)
+            smtp.send_message(msg)
